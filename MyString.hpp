@@ -29,6 +29,7 @@ public:
 
 	// Konvertierkonstruktor Definition
 	MyString(char*);
+	MyString(string);
 
 	// Kopierkonstruktor
 	MyString(MyString const & str);
@@ -37,6 +38,7 @@ public:
 	void reserve(unsigned int);
 	MyString & append(MyString & str);
 	MyString & assign(MyString & str);
+	MyString & assign(string & str);
 	const char * c_str();
 	int size();
 	int capacity();
@@ -45,11 +47,12 @@ public:
 	char & at(unsigned int i);
 	MyString operator+ (MyString & str);
 	MyString operator= (MyString & str);
+	MyString operator= (string str);
 	bool operator== (MyString & str);
 	friend ostream & operator<< (ostream & o, MyString & str);
 	char & operator[] (unsigned int index);
-	static string trim(const string&, const char);										// Entfernt als default Leerzeichen, kann aber jedes belibige einzelne Zeichen aus einer Kette entfernen.
-
+	static string remove(const string&, const char);										// Entfernt als default Leerzeichen, kann aber jedes belibige einzelne Zeichen aus einer Kette entfernen.
+	
 private:
 	unsigned int strSize;
 	unsigned int strCapacity;
