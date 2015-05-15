@@ -12,6 +12,10 @@ Durchgefuehrte Aenderung						|Autor		|Datum
 Operatoren "+", "=", "[]" und "==" hinzugefügt  |Geckeler	|22.04.2015
 Überprufung ob angegbener Index OK ist bei Operator [] |Geckeler |23.04.2015 
 Operator "=" hinzugefügt um einen String dem MyString zuweisen zu Können und Kommentare hinzugefügt | Geckeler | 29.04.2015
+
+Operatoren und Methoden geändert für Lab3 A2    |Tommel     |15.5.15
+Operatoren und Methoden für 'Const' Argumente überladen.
+
 -------------------------------------------------------
 Programmbeschreibung:
 Klasse My String mit erweiterung von Operatoren
@@ -43,6 +47,14 @@ MyString::MyString(char* str)
 	strCapacity = strSize;
 }
 
+MyString::MyString(const char* str) {
+	strSize = (unsigned int)strlen(str);
+	strPtr = new char[strSize + 1];
+	//memcpy(strPtr, str, strSize);
+	strcpy_s(strPtr, strSize + 1, str);
+	strCapacity = strSize;
+}
+
 // Konvertierkonstruktor String -> MyString
 MyString::MyString(string str)
 {
@@ -61,6 +73,8 @@ MyString::MyString(MyString const & str)
 	strcpy_s(this->strPtr, str.strSize + 1, str.strPtr);
 	strCapacity = strSize;
 }
+
+
 
 // Destruktor
 MyString::~MyString()
@@ -94,6 +108,17 @@ MyString & MyString::append(MyString & str)
 	return *this;
 }
 
+MyString & MyString::append(const MyString & str){
+	MyString temp(str);
+	this->append(temp);
+	return *this;
+}
+
+MyString & MyString::append(const MyString & str)const{
+	MyString temp(str);
+	return this->append(temp);
+}
+
 // Methode um einen andern MyString dem Opjekt MySting zuweisen zukönnen.
 MyString & MyString::assign(MyString & str)
 {
@@ -102,6 +127,12 @@ MyString & MyString::assign(MyString & str)
 	reserve(str.strSize);
 	this->strSize = str.strSize;
 	strcpy_s(this->strPtr, str.strSize+1, str.strPtr);
+	return *this;
+}
+
+MyString & MyString::assign(const MyString & str){
+	MyString temp(str);
+	this->assign(temp);
 	return *this;
 }
 
@@ -121,15 +152,27 @@ const char* MyString::c_str()
 	return this->strPtr;
 }
 
+const char* MyString::c_str() const {
+	return this->strPtr;
+}
+
 // Methode um die größe des Strings abzufragen.
 int MyString::size()
 {
 	return strSize;
 }
 
+int MyString::size() const {
+	return strSize;
+}
+
 // Methode um die Kapazität abzufragen.
 int MyString::capacity()
 {
+	return strCapacity;
+}
+
+int MyString::capacity() const {
 	return strCapacity;
 }
 
@@ -151,6 +194,13 @@ bool MyString::empty()
 		return false;
 }
 
+bool MyString::empty() const {
+	MyString temp(this->strPtr);
+	bool ergebnis = false;
+	if (temp.empty() == true) ergebnis = true;
+	return ergebnis;
+}
+
 // Methode um das Zeichen an der abgegebene Position abzufragen.
 char & MyString::at(unsigned int i)
 {
@@ -161,11 +211,17 @@ char & MyString::at(unsigned int i)
 }
 
 // Operator "+" um Strings miteinander zu verbinden zu können.
-MyString MyString::operator+ (MyString & str)
-{
-	MyString temp(*this);
-	temp.append(str);
-	return temp;
+MyString MyString::operator+ (MyString & str){
+	return this->append(str);	// Tommel am 29.4.15
+	
+	//MyString temp(*this);
+	//temp.append(str);
+	//return temp;
+}
+
+MyString MyString::operator+ (const MyString & str)const{
+	MyString temp(this->strPtr);
+	return temp.append(MyString(str));
 }
 
 // Operator "=" um einen MyString zuweisen zu können. 
@@ -181,6 +237,15 @@ MyString MyString::operator= (string str)
 	return *this;
 }
 
+//char& MyString::operator= (char c){
+//	*this = c;
+//	return c;
+//}
+
+MyString MyString::operator=(const MyString &str){
+	return assign(MyString(str));
+}
+
 // Operator "==" um 2 Strings auf Gleichheit überprüfen zu können.
 bool MyString::operator== (MyString & str)
 {
@@ -192,10 +257,23 @@ bool MyString::operator== (MyString & str)
 	return result;
 }
 
+bool MyString::operator== (const MyString & str)const {
+	// return (MyString(this->strPtr) == MyString(str.strPtr)); // Funktioniert nicht weil...?
+
+	MyString tempLinks(this->strPtr);
+	MyString tempRechts(str.strPtr);
+	return (tempLinks == tempRechts);
+
+}
+
 // Operator "<<" für eine cout des Strings
 ostream & operator<< (ostream & o, MyString & str)
 {
 	return o<<str.c_str();
+}
+
+ostream & operator<< (ostream & o, const MyString & str){
+	return o << str.c_str();
 }
 
 char & MyString::operator[] (unsigned int index)
@@ -209,7 +287,7 @@ char & MyString::operator[] (unsigned int index)
 }
 
 // Die Methode entfernt alle Leehrzeichen aus einem String und gibt den bearbeiteten String zurück.
-// Es kann aber auch eine anderes Zeichen entvert werden. 
+// Es kann aber auch eine anderes Zeichen entfernt werden. 
 string MyString::remove(const string &str,const char c =' '){
 	
 	istringstream inputstring(str);
@@ -223,4 +301,4 @@ string MyString::remove(const string &str,const char c =' '){
 	} while (inputstring);
 
 	return returnStr;
-}
+};
